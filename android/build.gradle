@@ -10,8 +10,8 @@ apply plugin: 'com.android.application'
 
 android {
   namespace "iticbcn.elhueso.picapollo"
-  compileSdk 34
-  sourceSets {
+    compileSdk 34
+    sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
       java.setSrcDirs(['src/main/java'])
@@ -39,7 +39,7 @@ android {
     multiDexEnabled true
   }
   compileOptions {
-    sourceCompatibility "8"
+    sourceCompatibility "1.8"
     targetCompatibility "8"
     coreLibraryDesugaringEnabled true
   }

@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Predicate;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -20,42 +22,74 @@ import iticbcn.elhueso.picapollo.actors.Player;
 import iticbcn.elhueso.picapollo.actors.Spikes;
 import iticbcn.elhueso.picapollo.helpers.AssetManager;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
+import iticbcn.elhueso.picapollo.utils.Settings;
 
 
 public class GameScreen implements Screen {
 
     private int levelNum;
+    private Pixmap layout;
+
+    private OrthographicCamera camera;
+    private FitViewport viewport;
     private Stage stage;
+
+    private ShapeRenderer shapeRenderer;
+    private List<PPGRectangle> debugRectangles;
 
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
     private static final int LAST_LEVEL_NUM = 3;
-    private static final float TILE_SIZE = 32;
+    private static final float TILE_SIZE = 1;
 
     public GameScreen(int levelNum) {
         this.levelNum = levelNum;
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(true, Settings.GAME_WIDTH, Settings.GAME_HEIGHT);
+        camera.position.set(Settings.GAME_WIDTH / 2f, Settings.GAME_HEIGHT / 2f, 0);
+        camera.update();
+        viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
+        stage = new Stage(viewport);
     }
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
 
         // Carreguem la imatge
-        Pixmap layout = new Pixmap(Gdx.files.internal("level_" + levelNum + "_layout.png"));
+        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
+        System.out.println("Pixmap loaded: " + layout.getWidth() + "x" + layout.getHeight());
         // Obtenim els rectangles de colors del mapa
-        List<PPGRectangle> blocs = detectBlocksByColor(layout, TILE_SIZE, BACKGROUND_COLOR);
+        // List<PPGRectangle> blocs = detectBlocksByColor(layout, TILE_SIZE, BACKGROUND_COLOR);
 
-        for (PPGRectangle rect : blocs) {
-            createActor(rect);
-        }
+//        for (PPGRectangle rect : blocs) {
+//            createActor(rect);
+//        }
+
+
+        // DEBUG
+        shapeRenderer = new ShapeRenderer();
+        debugRectangles = detectBlocksByColor(layout, TILE_SIZE, BACKGROUND_COLOR);
+        System.out.println("Rectangles trobats: " + debugRectangles.size());
     }
 
     public void render(float delta) {
+        // DEBUG
+        Gdx.gl.glClearColor(173f / 255f, 216f / 255f, 230f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        viewport.apply();
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (PPGRectangle rect : debugRectangles) {
+            shapeRenderer.setColor(rect.getColor());
+            shapeRenderer.rect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+        }
+        shapeRenderer.end();
     }
 
     @Override
     public void resize(int width, int height) {
-
+        viewport.update(width, height);
     }
 
     @Override
@@ -75,32 +109,16 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
-    }
-
-    // Instancia un actor segons les propietats del rectangle
-    private void createActor(PPGRectangle rect) {
-        Color c = rect.getColor();
-
-        if (isPlatform(c)) {
-
-        } else if (isCollectable(c)) {
-
-        } else if (isEnemy(c)) {
-
-        } else if (isGoal(c)) {
-
-        } else if (isSpike(c)) {
-
-        } else if (isPlayerSpawn(c)) {
-
-        }
+        layout.dispose();
+        shapeRenderer.dispose();
+        stage.dispose();
     }
 
     // Algoritme que detecta blocs de colors en un mapa
     // Donat un mapa, el recorre cap a la dreta i cap a baix
     // Busca blocs de pixels d'un mateix color i crea un rectangle per a cada un.
     private List<PPGRectangle> detectBlocksByColor(Pixmap map, float tileSize, Color backgroundColor) {
+        System.out.println("Comença la busqueda de rectangles");
         int mapWidth = map.getWidth();
         int mapHeight = map.getHeight();
 
@@ -109,6 +127,7 @@ public class GameScreen implements Screen {
         List<PPGRectangle> blocs = new ArrayList<>();
 
         for (int y = 0; y < mapHeight; y++) {
+            System.out.println("NOVA FILA");
             for (int x = 0; x < mapWidth; x++) {
                 if (utilitzat[x][y]) {
                     continue;
@@ -116,6 +135,7 @@ public class GameScreen implements Screen {
 
                 Color baseColor = new Color();
                 Color.rgba8888ToColor(baseColor, map.getPixel(x, y));
+                System.out.println("Primer píxel: R=" + baseColor.r + " G=" + baseColor.g + " B=" + baseColor.b + " A=" + baseColor.a);
 
                 // Ignorem pixels del fons
                 if (baseColor.equals(backgroundColor)) {
@@ -153,9 +173,29 @@ public class GameScreen implements Screen {
 
                 PPGRectangle rectangle = new PPGRectangle(worldX, worldY, rectWidth * tileSize, rectHeight * tileSize, baseColor);
                 blocs.add(rectangle);
+                System.out.println("RECTANGLE TROBAT");
             }
         }
         return blocs;
+    }
+
+    // Instancia un actor segons les propietats del rectangle
+    private void createActor(PPGRectangle rect) {
+        Color c = rect.getColor();
+
+        if (isPlatform(c)) {
+            stage.addActor(new Platform(AssetManager.platformTexture, rect));
+        } else if (isCollectable(c)) {
+            stage.addActor(new Collectable(AssetManager.collectableTexture, rect));
+        } else if (isEnemy(c)) {
+            stage.addActor(new Enemy(AssetManager.enemyTexture, rect));
+        } else if (isGoal(c)) {
+            stage.addActor(new Goal(AssetManager.platformTexture, rect));
+        } else if (isSpike(c)) {
+            stage.addActor(new Spikes(AssetManager.platformTexture, rect));
+        } else if (isPlayerSpawn(c)) {
+            stage.addActor(new Player(AssetManager.playerTexture, rect));
+        }
     }
 
     // Detectors de colors

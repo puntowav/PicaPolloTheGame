@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import iticbcn.elhueso.picapollo.helpers.AssetManager;
 import iticbcn.elhueso.picapollo.screens.GameScreen;
+import iticbcn.elhueso.picapollo.screens.TitleScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MainGame extends Game {
@@ -17,7 +18,7 @@ public class MainGame extends Game {
     @Override
     public void create() {
         //AssetManager.load();
-        setScreen(new GameScreen(1));
+        setScreen(new TitleScreen(this));
 
     }
 

@@ -19,15 +19,20 @@ public class Platform extends Actor {
 
     public Platform(Texture texture, PPGRectangle rect) {
         this.texture = texture;
-        // Utilitzem les propietats x, y, width i height d'Actor
         bounds = rect;
+        
         setBounds(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     }
 
     public Texture getTexture() {
         return texture;
     }
+
     public void setTexture(Texture texture) {
         this.texture = texture;
+    }
+
+    public PPGRectangle getBounds() {
+        return bounds;
     }
 }

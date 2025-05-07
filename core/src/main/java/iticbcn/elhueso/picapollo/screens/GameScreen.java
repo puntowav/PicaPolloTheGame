@@ -1,5 +1,6 @@
 package iticbcn.elhueso.picapollo.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -33,6 +34,8 @@ public class GameScreen implements Screen {
     private FitViewport viewport;
     private Stage stage;
 
+    private Game game;
+
     private ShapeRenderer shapeRenderer;
     private List<PPGRectangle> debugRectangles;
 
@@ -40,7 +43,8 @@ public class GameScreen implements Screen {
     private static final int LAST_LEVEL_NUM = 3;
     private static final float TILE_SIZE = 1f;
 
-    public GameScreen(int levelNum) {
+    public GameScreen(Game game, int levelNum) {
+        this.game = game;
         this.levelNum = levelNum;
         shapeRenderer = new ShapeRenderer();
         camera = new OrthographicCamera();

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -37,6 +36,7 @@ public class GameScreen implements Screen {
     private Player player;
 
     private Game game;
+    private List<PPGRectangle> rectanglesNivell;
 
     private ShapeRenderer shapeRenderer;
     private List<PPGRectangle> debugRectangles;
@@ -44,6 +44,8 @@ public class GameScreen implements Screen {
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
     private static final int LAST_LEVEL_NUM = 3;
     private static final float TILE_SIZE = 1f;
+
+    public static List<PPGRectangle> plataformesNivell;
 
     public GameScreen(Game game, int levelNum) {
         this.game = game;
@@ -55,25 +57,27 @@ public class GameScreen implements Screen {
         camera.update();
         viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
         stage = new Stage(viewport);
-        //cal modificar
-        player = new Player(AssetManager.playerTexture, new PPGRectangle(4, 4,4, 4, Color.RED));
+
+        // Obrim el mapa del nivell com a un  Bitmap
+        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
+        // Obtenim els rectangles de colors del mapa
+        // List<PPGRectangle> blocs = detectBlocksByColor(layout);
+        debugRectangles = detectBlocksByColor(layout);
+        // Guardem les plataformes
+        plataformesNivell = getNormalPlatforms();
     }
 
     @Override
     public void show() {
 
         // Carreguem la imatge
-        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
         System.out.println("PIXMAP LOADED: " + layout.getWidth() + "x" + layout.getHeight());
-        // Obtenim els rectangles de colors del mapa
-        // List<PPGRectangle> blocs = detectBlocksByColor(layout, TILE_SIZE, BACKGROUND_COLOR);
 
 //        for (PPGRectangle rect : blocs) {
 //            createActor(rect);
 //        }
 
         // DEBUG
-        debugRectangles = detectBlocksByColor(layout);
         System.out.println("RECTANGLES TROBATS: " + debugRectangles.size());
     }
 
@@ -208,7 +212,8 @@ public class GameScreen implements Screen {
         } else if (isSpike(c)) {
             stage.addActor(new SpikesPlatform(AssetManager.platformTexture, rect));
         } else if (isPlayerSpawn(c)) {
-            stage.addActor(new Player(AssetManager.playerTexture, rect));
+            player = new Player(AssetManager.playerTexture, rect);
+            stage.addActor(player);
         }
     }
 
@@ -230,5 +235,20 @@ public class GameScreen implements Screen {
     }
     private boolean isPlayerSpawn(Color c) {
         return c.b> .7f&&c.g>.1f&&c.g<.7f;
+    }
+
+    /**
+     *
+     * Retorna una llista només amb les plataformes normals. Les utilitzarà Player
+     * Per anar comprovant si hi ha col·lisions.
+     */
+    private List<PPGRectangle> getNormalPlatforms() {
+        List<PPGRectangle> list2return = new ArrayList<>();
+        for (PPGRectangle rect : rectanglesNivell) {
+            if (isPlatform(rect.getColor())) {
+                list2return.add(rect);
+            }
+        }
+        return list2return;
     }
 }

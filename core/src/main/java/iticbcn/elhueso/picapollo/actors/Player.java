@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import java.util.List;
+
+import iticbcn.elhueso.picapollo.screens.GameScreen;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
 
 public class Player extends Actor {
@@ -26,6 +29,7 @@ public class Player extends Actor {
     public void act(float delta) {
         super.act(delta);
         bounds.setPosition(getX(), getY());
+        List<PPGRectangle> llistaPlataformes = GameScreen.plataformesNivell;
     }
 
     public Texture getTexture() {

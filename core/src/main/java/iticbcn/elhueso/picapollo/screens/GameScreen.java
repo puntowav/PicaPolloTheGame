@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -33,6 +34,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private Stage stage;
+    private Player player;
 
     private Game game;
 
@@ -53,6 +55,8 @@ public class GameScreen implements Screen {
         camera.update();
         viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
         stage = new Stage(viewport);
+        //cal modificar
+        player = new Player(AssetManager.playerTexture, new PPGRectangle(4, 4,4, 4, Color.RED));
     }
 
     @Override
@@ -114,6 +118,12 @@ public class GameScreen implements Screen {
         shapeRenderer.dispose();
         stage.dispose();
     }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public Player getPlayer(){return player;}
 
     // Algoritme que detecta blocs de colors en un mapa
     // Donat un mapa, el recorre cap a la dreta i cap a baix

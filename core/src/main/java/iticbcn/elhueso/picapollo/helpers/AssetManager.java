@@ -1,5 +1,8 @@
 package iticbcn.elhueso.picapollo.helpers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
 public class AssetManager {
@@ -11,6 +14,11 @@ public class AssetManager {
     public static Texture goalTexture;
     public static Texture collectableTexture;
     public static Texture grass;
+    public static Music titleSong;
+    public static Music backgroundSong;
+    public static Sound fartSound;
+    public static Sound goalReached;
+    public static Sound grabCollectable;
 
     public static void load() {
         playerTexture      = new Texture("player.png");
@@ -20,6 +28,14 @@ public class AssetManager {
         goalTexture        = new Texture("goal.png");
         collectableTexture = new Texture("collectible.png");
         grass = new Texture("grass.png");
+
+        // music and sounds
+        titleSong = Gdx.audio.newMusic(Gdx.files.internal("music/title_song.mp3"));
+        backgroundSong = Gdx.audio.newMusic(Gdx.files.internal("music/background_music.mp3"));
+        fartSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fart.mp3"));
+        goalReached = Gdx.audio.newSound(Gdx.files.internal("sounds/goal_reached.mp3"));
+        grabCollectable = Gdx.audio.newSound(Gdx.files.internal("sounds/grab_collectable.mp3"));
+
     }
 
     public static void dispose() {
@@ -30,5 +46,10 @@ public class AssetManager {
         goalTexture.dispose();
         collectableTexture.dispose();
         grass.dispose();
+        titleSong.dispose();
+        backgroundSong.dispose();
+        fartSound.dispose();
+        goalReached.dispose();
+        grabCollectable.dispose();
     }
 }

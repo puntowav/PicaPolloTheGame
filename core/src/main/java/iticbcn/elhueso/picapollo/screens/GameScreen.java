@@ -7,9 +7,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.InputMultiplexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,7 @@ import iticbcn.elhueso.picapollo.actors.SpikesPlatform;
 import iticbcn.elhueso.picapollo.helpers.AssetManager;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
 import iticbcn.elhueso.picapollo.utils.Settings;
+import iticbcn.elhueso.picapollo.utils.InputHandler;
 
 
 public class GameScreen implements Screen {
@@ -79,14 +83,18 @@ public class GameScreen implements Screen {
     public void show() {
 
         // Carreguem la imatge
-        System.out.println("PIXMAP LOADED: " + layout.getWidth() + "x" + layout.getHeight());
+        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
+        // Obtenim els rectangles de colors del mapa
+        List<PPGRectangle> blocs = detectBlocksByColor(layout);
 
-//        for (PPGRectangle rect : blocs) {
-//            createActor(rect);
-//        }
+         for (PPGRectangle rect : blocs) {
+            createActor(rect);
+         }
 
-        // DEBUG
-        System.out.println("RECTANGLES TROBATS: " + debugRectangles.size());
+         InputMultiplexer mux = new InputMultiplexer();
+         mux.addProcessor(new InputHandler(this));
+         mux.addProcessor(stage);
+         Gdx.input.setInputProcessor(mux);
     }
 
     public void render(float delta) {
@@ -95,13 +103,26 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         viewport.apply();
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (PPGRectangle rect : debugRectangles) {
-            shapeRenderer.setColor(rect.getColor());
-            shapeRenderer.rect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+        stage.act(delta);
+        checkPlatformCollision();
+        stage.draw();
+    }
+
+    public void checkPlatformCollision(){
+        boolean landed = false;
+        for (Actor actor : stage.getActors()) {
+            if (actor instanceof Platform) {
+                Platform plat = (Platform) actor;
+                if (player.isLandingOn(plat)) {
+                    player.landOn(plat);
+                    landed = true;
+                    break;
+                }
+            }
         }
-        shapeRenderer.end();
+        if (!landed) {
+            player.fallOffPlatform();
+        }
     }
 
     @Override

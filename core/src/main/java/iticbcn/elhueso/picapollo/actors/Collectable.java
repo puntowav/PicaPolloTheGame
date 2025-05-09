@@ -21,8 +21,6 @@ public class Collectable extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-
-        if (bounds.overlaps())
     }
 
     @Override

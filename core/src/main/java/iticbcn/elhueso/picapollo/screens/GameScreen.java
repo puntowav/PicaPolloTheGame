@@ -27,26 +27,31 @@ import iticbcn.elhueso.picapollo.utils.Settings;
 
 public class GameScreen implements Screen {
 
+    // Constants
+    private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
+    private static final int LAST_LEVEL_NUM = 3;
+    private static final float TILE_SIZE = 1f;
+
     private int levelNum;
     private Pixmap layout;
 
     private OrthographicCamera camera;
     private FitViewport viewport;
     private Stage stage;
-    private Player player;
 
     private Game game;
-    private List<PPGRectangle> levelActors;
-    private List<Collectable> levelCollectables;
 
+    // Actors
+    private List<PPGRectangle> allLevelActors;
+    private List<Platform> levelPlatforms;
+    private List<SpikesPlatform> levelSpikes;
+    private List<Collectable> levelCollectables;
+    private Player player;
+    private Goal goal;
+
+    // DEBUG TOOLS
     private ShapeRenderer shapeRenderer;
     private List<PPGRectangle> debugRectangles;
-
-    private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
-    private static final int LAST_LEVEL_NUM = 3;
-    private static final float TILE_SIZE = 1f;
-
-    public List<PPGRectangle> plataformesNivell;
 
     public GameScreen(Game game, int levelNum) {
         this.game = game;
@@ -65,8 +70,9 @@ public class GameScreen implements Screen {
         // List<PPGRectangle> blocs = detectBlocksByColor(layout);
         debugRectangles = detectBlocksByColor(layout);
         // Llistes d'actors
-        levelPlatforms = getNormalPlatforms();
-        levelCollectables = new List
+        levelPlatforms = new ArrayList<>();
+        levelSpikes = new ArrayList<>();
+        levelCollectables = new ArrayList<>();
     }
 
     @Override
@@ -204,15 +210,22 @@ public class GameScreen implements Screen {
         Color c = rect.getColor();
 
         if (isPlatform(c)) {
-            stage.addActor(new Platform(AssetManager.platformTexture, rect));
+            Platform platform = new Platform(AssetManager.platformTexture, rect);
+            levelPlatforms.add(platform);
+            stage.addActor(platform);
         } else if (isCollectable(c)) {
-            stage.addActor(new Collectable(AssetManager.collectableTexture, rect));
+            Collectable coll = new Collectable(AssetManager.collectableTexture, rect);
+            levelCollectables.add(coll);
+            stage.addActor(coll);
         } else if (isEnemy(c)) {
             stage.addActor(new Enemy(AssetManager.enemyTexture, rect));
         } else if (isGoal(c)) {
-            stage.addActor(new Goal(AssetManager.platformTexture, rect));
+            goal = new Goal(AssetManager.platformTexture, rect);
+            stage.addActor(goal);
         } else if (isSpike(c)) {
-            stage.addActor(new SpikesPlatform(AssetManager.platformTexture, rect));
+            SpikesPlatform spikesPlatform = new SpikesPlatform(AssetManager.platformTexture, rect);
+            levelSpikes.add(spikesPlatform);
+            stage.addActor(spikesPlatform);
         } else if (isPlayerSpawn(c)) {
             player = new Player(AssetManager.playerTexture, rect);
             stage.addActor(player);

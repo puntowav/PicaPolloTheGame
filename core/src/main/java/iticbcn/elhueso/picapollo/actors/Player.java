@@ -30,8 +30,7 @@ public class Player extends Actor {
         super.act(delta);
 
         bounds.setPosition(getX(), getY());
-        List<PPGRectangle> llistaPlataformes = GameScreen.plataformesNivell;
-
+        // Aleatoriament, reproduir fart.mp3
 
     }
 

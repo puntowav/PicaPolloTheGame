@@ -36,7 +36,8 @@ public class GameScreen implements Screen {
     private Player player;
 
     private Game game;
-    private List<PPGRectangle> rectanglesNivell;
+    private List<PPGRectangle> levelActors;
+    private List<Collectable> levelCollectables;
 
     private ShapeRenderer shapeRenderer;
     private List<PPGRectangle> debugRectangles;
@@ -45,7 +46,7 @@ public class GameScreen implements Screen {
     private static final int LAST_LEVEL_NUM = 3;
     private static final float TILE_SIZE = 1f;
 
-    public static List<PPGRectangle> plataformesNivell;
+    public List<PPGRectangle> plataformesNivell;
 
     public GameScreen(Game game, int levelNum) {
         this.game = game;
@@ -63,8 +64,9 @@ public class GameScreen implements Screen {
         // Obtenim els rectangles de colors del mapa
         // List<PPGRectangle> blocs = detectBlocksByColor(layout);
         debugRectangles = detectBlocksByColor(layout);
-        // Guardem les plataformes
-        plataformesNivell = getNormalPlatforms();
+        // Llistes d'actors
+        levelPlatforms = getNormalPlatforms();
+        levelCollectables = new List
     }
 
     @Override
@@ -235,20 +237,5 @@ public class GameScreen implements Screen {
     }
     private boolean isPlayerSpawn(Color c) {
         return c.b> .7f&&c.g>.1f&&c.g<.7f;
-    }
-
-    /**
-     *
-     * Retorna una llista només amb les plataformes normals. Les utilitzarà Player
-     * Per anar comprovant si hi ha col·lisions.
-     */
-    private List<PPGRectangle> getNormalPlatforms() {
-        List<PPGRectangle> list2return = new ArrayList<>();
-        for (PPGRectangle rect : rectanglesNivell) {
-            if (isPlatform(rect.getColor())) {
-                list2return.add(rect);
-            }
-        }
-        return list2return;
     }
 }

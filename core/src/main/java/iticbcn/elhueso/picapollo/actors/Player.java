@@ -28,8 +28,11 @@ public class Player extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+
         bounds.setPosition(getX(), getY());
         List<PPGRectangle> llistaPlataformes = GameScreen.plataformesNivell;
+
+
     }
 
     public Texture getTexture() {

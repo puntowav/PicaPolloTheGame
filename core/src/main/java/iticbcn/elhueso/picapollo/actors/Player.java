@@ -1,11 +1,15 @@
 package iticbcn.elhueso.picapollo.actors;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.QuadTreeFloat;
 
 import java.util.List;
+import java.util.Random;
 
 import iticbcn.elhueso.picapollo.screens.GameScreen;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
@@ -17,9 +21,9 @@ public class Player extends Actor {
     private Platform currentPlatform = null;
 
     private final float SPEED = 200f;
-    private final float JUMP_VELOCITY = 500f;
-    private final float GRAVITY = -1000f;
-    private static final float MAX_FALL_SPEED = -800f;
+    private final float JUMP_VELOCITY = -500f;
+    private final float GRAVITY = 1000f;
+    private static final float MAX_FALL_SPEED = 800f;
 
     private Texture texture;
     private PPGRectangle bounds;
@@ -32,26 +36,23 @@ public class Player extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(texture, getX(), getY(), getWidth(), getHeight());
+        float x = getX(), y = getY(), w = getWidth(), h = getHeight();
+
+        batch.draw(
+            texture,
+            x + w, y + h,
+            -w, -h
+        );
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-
-        if(!onGround){
-            velocity.y += GRAVITY * delta;
-            if(velocity.y < MAX_FALL_SPEED) velocity.y = MAX_FALL_SPEED;
-        }
-
-        moveBy(velocity.x * delta, velocity.y * delta);
         bounds.setPosition(getX(), getY());
-        // Aleatoriament, reproduir fart.mp3
     }
 
     public void moveLeft(){velocity.x = -SPEED;}
     public void moveRight(){velocity.x = SPEED;}
-    public void stop(){velocity.x = 0;}
     public void jump(){
         if(onGround){
             velocity.y = JUMP_VELOCITY;
@@ -63,11 +64,15 @@ public class Player extends Actor {
     public boolean isLandingOn(Platform platform){
         PPGRectangle p = bounds;
         PPGRectangle plat = platform.getBounds();
+        boolean horz =
+            p.x + p.width > plat.x &&
+                p.x < plat.x + plat.width;
 
-        return p.overlaps(plat)
-            && velocity.y <= 0
-            && p.y >= plat.y + plat.height - 5
-            && p.y <= plat.y + plat.height + 5;
+        float platTop = plat.y + plat.height;
+        boolean closeVert =
+            p.y >= platTop - 5 &&
+                p.y <= platTop + 5;
+        return horz && closeVert && velocity.y >= 0;
     }
 
     public void landOn(Platform platform){
@@ -95,5 +100,35 @@ public class Player extends Actor {
 
     public PPGRectangle getBounds() {
         return bounds;
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
+    public void applyGravity(float delta) {
+        if (!onGround) {
+            velocity.y += GRAVITY * delta;
+            velocity.y = Math.min(velocity.y, MAX_FALL_SPEED);
+        }
+    }
+
+    public void moveX(float delta) {
+        moveBy(velocity.x * delta, 0);
+        bounds.setPosition(getX(), getY());
+    }
+
+    public void moveY(float delta) {
+        moveBy(0, velocity.y * delta);
+        bounds.setPosition(getX(), getY());
+    }
+
+    public void stopX() {
+        velocity.x = 0;
+    }
+
+    public void resetVertical() {
+        velocity.y = 0;
+        onGround = false;
     }
 }

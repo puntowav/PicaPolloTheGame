@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.InputMultiplexer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import iticbcn.elhueso.picapollo.actors.Collectable;
@@ -68,30 +69,24 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
         stage = new Stage(viewport);
 
-        // Obrim el mapa del nivell com a un  Bitmap
-        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
-        // Obtenim els rectangles de colors del mapa
-        // List<PPGRectangle> blocs = detectBlocksByColor(layout);
-        debugRectangles = detectBlocksByColor(layout);
         // Llistes d'actors
         levelPlatforms = new ArrayList<>();
         levelSpikes = new ArrayList<>();
         levelCollectables = new ArrayList<>();
+
+        // Obrim el mapa del nivell com a un  Bitmap
+        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
+        List<PPGRectangle> blocs = detectBlocksByColor(layout);
+
+        for (PPGRectangle rect : blocs) {
+            createActor(rect);
+        }
+        System.out.println("Fi del constructor");
     }
 
     @Override
     public void show() {
-
-        // Carreguem la imatge
-        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
-        // Obtenim els rectangles de colors del mapa
-        List<PPGRectangle> blocs = detectBlocksByColor(layout);
-
-         for (PPGRectangle rect : blocs) {
-            createActor(rect);
-         }
-
-         InputMultiplexer mux = new InputMultiplexer();
+        InputMultiplexer mux = new InputMultiplexer();
          mux.addProcessor(new InputHandler(this));
          mux.addProcessor(stage);
          Gdx.input.setInputProcessor(mux);
@@ -104,25 +99,85 @@ public class GameScreen implements Screen {
 
         viewport.apply();
         stage.act(delta);
-        checkPlatformCollision();
+        checkPlatform(delta);
+        checkSpikes();
+        checkCollectables();
+        checkGoal();
         stage.draw();
     }
 
-    public void checkPlatformCollision(){
-        boolean landed = false;
-        for (Actor actor : stage.getActors()) {
-            if (actor instanceof Platform) {
-                Platform plat = (Platform) actor;
-                if (player.isLandingOn(plat)) {
-                    player.landOn(plat);
-                    landed = true;
-                    break;
+    public void checkPlatform(float delta) {
+        if (player == null) return;
+
+        player.applyGravity(delta);
+        player.moveX(delta);
+
+        for (Platform plat : levelPlatforms) {
+            if (player.getBounds().overlaps(plat.getBounds())) {
+                if (player.getVelocity().x > 0) {
+                    player.setX(plat.getX() - player.getWidth());
+                } else if (player.getVelocity().x < 0) {
+                    player.setX(plat.getX() + plat.getWidth());
                 }
+                player.stopX();
+            }
+        }
+
+        player.moveY(delta);
+
+        boolean landed = false;
+        for (Platform plat : levelPlatforms) {
+            if (player.isLandingOn(plat)) {
+                player.landOn(plat);
+                landed = true;
+                break;
+            }else if (player.getBounds().overlaps(plat.getBounds())) {
+                player.setY(plat.getY() + plat.getHeight());
+                player.resetVertical();
+                landed = true;
+                break;
             }
         }
         if (!landed) {
             player.fallOffPlatform();
         }
+    }
+
+    private void checkSpikes() {
+        for (SpikesPlatform spike : levelSpikes) {
+            if (player.getBounds().overlaps(spike.getBounds())) {
+                onPlayerDeath();
+                return;
+            }
+        }
+    }
+
+    public  void checkCollectables(){
+        if (player == null) return;
+        for(int i = 0; i < levelCollectables.size(); i++){
+            Collectable coll = levelCollectables.get(i);
+            if(player.getBounds().overlaps(coll.getBounds())){
+                coll.remove();
+                levelCollectables.remove(i);
+            }
+
+        }
+
+        if(levelCollectables.isEmpty() && goal != null){
+            goal.setVisible(true);
+        }
+    }
+
+    public void checkGoal(){
+        if (player == null) return;
+        if(goal != null && goal.isVisible() && player.getBounds().overlaps(goal.getBounds())){
+            game.setScreen(new EndScreen(game, true));
+        }
+    }
+
+    public void onPlayerDeath(){
+        game.setScreen(new EndScreen(game,false));
+        dispose();
     }
 
     @Override
@@ -231,22 +286,29 @@ public class GameScreen implements Screen {
         Color c = rect.getColor();
 
         if (isPlatform(c)) {
-            Platform platform = new Platform(AssetManager.platformTexture, rect);
-            levelPlatforms.add(platform);
-            stage.addActor(platform);
+            Platform p = new Platform(AssetManager.platformTexture, rect);
+            levelPlatforms.add(p);
+            stage.addActor(p);
+
+        } else if (isSpike(c)) {
+            SpikesPlatform sp = new SpikesPlatform(AssetManager.spikeTexture, rect);
+            levelSpikes.add(sp);
+            stage.addActor(sp);
+
         } else if (isCollectable(c)) {
             Collectable coll = new Collectable(AssetManager.collectableTexture, rect);
             levelCollectables.add(coll);
             stage.addActor(coll);
+
         } else if (isEnemy(c)) {
-            stage.addActor(new Enemy(AssetManager.enemyTexture, rect));
+            Enemy e = new Enemy(AssetManager.enemyTexture, rect);
+            stage.addActor(e);
+
         } else if (isGoal(c)) {
-            goal = new Goal(AssetManager.platformTexture, rect);
+            goal = new Goal(AssetManager.goalTexture, rect);
+            //goal.setVisible(false);
             stage.addActor(goal);
-        } else if (isSpike(c)) {
-            SpikesPlatform spikesPlatform = new SpikesPlatform(AssetManager.platformTexture, rect);
-            levelSpikes.add(spikesPlatform);
-            stage.addActor(spikesPlatform);
+
         } else if (isPlayerSpawn(c)) {
             player = new Player(AssetManager.playerTexture, rect);
             stage.addActor(player);
@@ -254,22 +316,33 @@ public class GameScreen implements Screen {
     }
 
     // Detectors de colors
-    private boolean isPlatform(Color c)    {
-        return c.r>.5f&&c.g<.5f&&c.b<.1f;
+    private boolean isPlatform(Color c) {
+        // marrón (139,69,19) → r≈0.55, g≈0.27, b≈0.07
+        return c.r > 0.5f && c.g < 0.4f && c.b < 0.1f;
     }
-    private boolean isSpike(Color c)       {
-        return c.r> .9f&&c.g<.1f&&c.b<.1f;
+
+    private boolean isSpike(Color c) {
+        // rojo puro
+        return c.r > 0.9f && c.g < 0.1f && c.b < 0.1f;
     }
-    private boolean isEnemy(Color c)       {
-        return c.r>.5f&&c.b>.5f&&c.g<.1f;
+
+    private boolean isEnemy(Color c) {
+        // púrpura (128,0,128) → r>.5, b>.5, g≈0
+        return c.r > 0.5f && c.b > 0.5f && c.g < 0.1f;
     }
-    private boolean isGoal(Color c)        {
-        return c.g> .9f&&c.r<.1f&&c.b<.1f;
-    }
+
     private boolean isCollectable(Color c) {
-        return c.r> .9f&&c.g> .9f&&c.b<.1f;
+        // amarillo puro
+        return c.r > 0.9f && c.g > 0.9f && c.b < 0.1f;
     }
+
+    private boolean isGoal(Color c) {
+        // verde puro
+        return c.g > 0.9f && c.r < 0.1f && c.b < 0.1f;
+    }
+
     private boolean isPlayerSpawn(Color c) {
-        return c.b> .7f&&c.g>.1f&&c.g<.7f;
+        // cian ~ (0,191,255)
+        return c.r < 0.1f && c.g > 0.2f && c.b > 0.5f;
     }
 }

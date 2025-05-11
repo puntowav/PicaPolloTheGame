@@ -25,6 +25,14 @@ public class Collectable extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(texture, getX(), getY(), getWidth(), getHeight());
+        float x = getX(), y = getY(), w = getWidth(), h = getHeight();
+
+        batch.draw(
+            texture,
+            x + w, y + h,
+            -w, -h
+        );
     }
+
+    public PPGRectangle getBounds(){return bounds;}
 }

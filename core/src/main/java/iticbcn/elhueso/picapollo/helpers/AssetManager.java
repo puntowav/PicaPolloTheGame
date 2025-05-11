@@ -22,12 +22,12 @@ public class AssetManager {
 
     public static void load() {
         playerTexture      = new Texture("player.png");
-        platformTexture    = new Texture("platform.png");
-        spikeTexture       = new Texture("spike.png");
-        enemyTexture       = new Texture("enemy.png");
-        goalTexture        = new Texture("goal.png");
-        collectableTexture = new Texture("collectible.png");
-        grass = new Texture("grass.png");
+        platformTexture    = new Texture("levels/platform.png");
+        spikeTexture       = new Texture("levels/spike.png");
+        enemyTexture       = new Texture("levels/enemy.png");
+        goalTexture        = new Texture("levels/goal.png");
+        collectableTexture = new Texture("levels/collectible.png");
+        grass = new Texture("levels/grass.png");
 
         // music and sounds
         titleSong = Gdx.audio.newMusic(Gdx.files.internal("music/title_song.mp3"));

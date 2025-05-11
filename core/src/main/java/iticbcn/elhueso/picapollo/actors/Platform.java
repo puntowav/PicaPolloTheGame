@@ -20,7 +20,7 @@ public class Platform extends Actor {
     public Platform(Texture texture, PPGRectangle rect) {
         this.texture = texture;
         bounds = rect;
-        
+
         setBounds(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     }
 
@@ -34,5 +34,16 @@ public class Platform extends Actor {
 
     public PPGRectangle getBounds() {
         return bounds;
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        float x = getX(), y = getY(), w = getWidth(), h = getHeight();
+
+        batch.draw(
+            texture,
+            x + w, y + h,
+            -w, -h
+        );
     }
 }

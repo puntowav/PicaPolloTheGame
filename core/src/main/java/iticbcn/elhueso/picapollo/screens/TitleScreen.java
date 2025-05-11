@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -67,7 +66,6 @@ public class TitleScreen implements Screen {
         for (TextureRegion region : flagAnimation.getKeyFrames()) {
             region.getTexture().dispose();
         }
-        AssetManager.dispose();
         batch.dispose();
     }
     @Override public void show() {}
@@ -94,7 +92,6 @@ public class TitleScreen implements Screen {
 
         if(Gdx.input.justTouched()) {
             game.setScreen(new GameScreen(game, 1));
-            dispose();
         }
     }
 }

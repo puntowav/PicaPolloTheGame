@@ -17,7 +17,7 @@ public class MainGame extends Game {
 
     @Override
     public void create() {
-        //AssetManager.load();
+        AssetManager.load();
         setScreen(new TitleScreen(this));
 
     }
@@ -25,6 +25,6 @@ public class MainGame extends Game {
     @Override
     public void dispose() {
         super.dispose();
-        //AssetManager.dispose();
+        AssetManager.dispose();
     }
 }

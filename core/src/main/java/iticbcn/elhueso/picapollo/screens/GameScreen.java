@@ -164,9 +164,12 @@ public class GameScreen implements Screen {
             // choque con techo (subiendo)
             if (player.getBounds().overlaps(plat.getBounds())
                 && player.getVelocity().y > 0) {
+                // reposiciona justo debajo de la plataforma
                 player.setY(plat.getY() - player.getHeight());
+                // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
+                player.resetJumps(); // ← aquí recuperas el salto al golpear por debajo
                 break;
             }
         }
@@ -181,6 +184,7 @@ public class GameScreen implements Screen {
                 "  onGround=" + player.getOnGround()
         );
     }
+
 
     private void checkSpikes() {
         for (SpikesPlatform spike : levelSpikes) {

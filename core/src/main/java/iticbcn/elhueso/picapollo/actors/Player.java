@@ -24,6 +24,8 @@ public class Player extends Actor {
     private boolean onGround = true;
     private Platform currentPlatform = null;
 
+    private int jumpsRemaining = 1;
+
     private final float SPEED = 200f;
     private final float JUMP_VELOCITY = -500f;
     private final float GRAVITY = 1000f;
@@ -59,72 +61,52 @@ public class Player extends Actor {
 
     public void moveLeft(){velocity.x = -SPEED;}
     public void moveRight(){velocity.x = SPEED;}
-    public void jump(){
-        System.out.println(onGround);
-        if(onGround){
+    public void jump() {
+        if (jumpsRemaining > 0) {
             Gdx.app.log("Player", "jump() invocado");
             velocity.y = JUMP_VELOCITY;
+            jumpsRemaining--;
             onGround = false;
             currentPlatform = null;
         }
     }
 
     public boolean isLandingOn(Platform plat) {
-        PPGRectangle p   = bounds;            // el rectángulo de colisión del jugador
-        PPGRectangle r   = plat.getBounds();  // el rectángulo de colisión de la plataforma
+        PPGRectangle p = bounds;
+        PPGRectangle r = plat.getBounds();
 
-        // 1) horz: solapamiento horizontal
         boolean horz = p.x + p.width > r.x && p.x < r.x + r.width;
 
-        // 2) platTop: la coordenada Y del tope de la plataforma
-        float platTop = r.y + r.height;
-        float playerBottomY = bounds.y + bounds.height;
-
-        // 3) closeVert: qué tan cerca está el pie del jugador (p.y) del tope
-        boolean closeVert = Math.abs(platTop - playerBottomY) <= 8f;
-
-        // 4) velocity.y: velocidad vertical actual del jugador, viene de getVelocity().y
-        //    p.y: posición Y actual del pie del jugador (bounds.y)
-
-        // ahora hacemos el println justo antes del return:
-        log.info(String.format(
-            "horz=%b closeVert=%b vel=%.1f p.y=%.1f platTop=%.1f",
-            horz, closeVert, velocity.y, p.y, platTop
-        ));
-
-        float platY    = plat.getBounds().y;
-        float platH    = plat.getBounds().height;
-
-        System.out.println(String.format(
-            "PLAT y=%.1f  h=%.1f  platTop=%.1f  |  P.Y(bnd)=%.1f  getY()=%.1f",
-            platY, platH, platTop,
-            bounds.y, getY()
-        ));
-
-        float playerFoot = p.y;
         float platformTop = r.y + r.height;
-        float margin = 5f;
+        float playerBottom = p.y;
 
-        boolean vert =
-            playerFoot >= platformTop - margin &&
-                playerFoot <= platformTop + margin;
+        // Aterriza solo si se mueve hacia abajo
+        boolean isFalling = velocity.y <= 0;
 
-        if (horz && vert) {
-            System.out.println("LANDING DETECTED on platform at y=" + platformTop);
-            return true;
-        }
+        // Está justo encima de la plataforma
+        boolean closeVert = playerBottom >= platformTop - TOLERANCE &&
+            playerBottom <= platformTop + TOLERANCE;
 
-        return horz && closeVert && velocity.y <= 0;
+        log.info(String.format(
+            "horz=%b closeVert=%b isFalling=%b vel=%.1f p.y=%.1f platTop=%.1f",
+            horz, closeVert, isFalling, velocity.y, playerBottom, platformTop
+        ));
+
+        return horz && closeVert && isFalling;
+    }
+
+    public void resetJumps() {
+        jumpsRemaining = 1;
     }
 
     public void landOn(Platform plat) {
-        // Log para depurar
         Gdx.app.log("Player", "landOn() en platform y=" + plat.getY());
         setY(plat.getY() + plat.getHeight());
         bounds.setPosition(getX(), getY());
         velocity.y = 0;
         onGround = true;
         currentPlatform = plat;
+        resetJumps();  // ↖ aquí recuperamos el salto al aterrizar
     }
 
     public void fallOffPlatform() {

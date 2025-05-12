@@ -7,8 +7,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.InputMultiplexer;
 
@@ -24,7 +30,6 @@ import iticbcn.elhueso.picapollo.actors.SpikesPlatform;
 import iticbcn.elhueso.picapollo.helpers.AssetManager;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
 import iticbcn.elhueso.picapollo.utils.Settings;
-import iticbcn.elhueso.picapollo.utils.InputHandler;
 
 
 public class GameScreen implements Screen {
@@ -40,6 +45,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private Stage stage;
+    private Stage hudStage;
 
     private Game game;
 
@@ -83,10 +89,68 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        InputMultiplexer mux = new InputMultiplexer();
-         mux.addProcessor(new InputHandler(this));
-         mux.addProcessor(stage);
-         Gdx.input.setInputProcessor(mux);
+        hudStage = new Stage(viewport);
+        InputMultiplexer mux = new InputMultiplexer(hudStage, stage);
+        Gdx.input.setInputProcessor(mux);
+
+
+
+        Texture sheet = new Texture(Gdx.files.internal("buttons.png"));
+
+        // Extraer regiones del spritesheet (col, fila)
+        TextureRegion left = getRegion(sheet, 0, 7);   // col 0, fila 7
+        TextureRegion right = getRegion(sheet, 1, 6); // col 1, fila 6
+        TextureRegion jump = getRegion(sheet, 0, 5);   // col 0, fila 5
+
+        // Crear botones y escalarlos para que se vean más grandes (64x64)
+        Image leftBtn = new Image(left);
+        Image rightBtn = new Image(right);
+        Image jumpBtn = new Image(jump);
+
+        leftBtn.setSize(128, 128);
+        rightBtn.setSize(128, 128);
+        jumpBtn.setSize(128, 128);
+
+        float btnSize = 128;
+        float margin = 20;
+        float btnY = Settings.GAME_HEIGHT - btnSize - margin;
+
+        leftBtn.setPosition(-10, btnY);
+        rightBtn.setPosition(200, btnY);
+        jumpBtn.setPosition(Settings.GAME_WIDTH - btnSize - 40, btnY);
+
+        leftBtn.getColor().a = 0.4f;
+        rightBtn.getColor().a = 0.4f;
+        jumpBtn.getColor().a = 0.4f;
+
+        // Añadir listeners
+        leftBtn.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent e, float x, float y, int p, int b) {
+                player.moveLeft(); return true;
+            }
+            public void touchUp(InputEvent e, float x, float y, int p, int b) {
+                player.stopX();
+            }
+        });
+        rightBtn.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent e, float x, float y, int p, int b) {
+                player.moveRight(); return true;
+            }
+            public void touchUp(InputEvent e, float x, float y, int p, int b) {
+                player.stopX();
+            }
+        });
+        jumpBtn.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent e, float x, float y, int p, int b) {
+                player.jump(); return true;
+            }
+        });
+
+        // Añadir al stage
+        hudStage.addActor(leftBtn);
+        hudStage.addActor(rightBtn);
+        hudStage.addActor(jumpBtn);
+
     }
 
     public void render(float delta) {
@@ -101,6 +165,8 @@ public class GameScreen implements Screen {
         checkCollectables();
         checkGoal();
         stage.draw();
+        hudStage.act(delta);
+        hudStage.draw();
 
 //        shapeRenderer.setProjectionMatrix(camera.combined);
 //        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -165,8 +231,7 @@ public class GameScreen implements Screen {
                 // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
-                player.resetJumps();
-                player.fallOffPlatform();
+                player.resetJumps(); // ← aquí recuperas el salto al golpear por debajo
                 break;
             }
         }
@@ -384,5 +449,11 @@ public class GameScreen implements Screen {
     private boolean isPlayerSpawn(Color c) {
         // cian ~ (0,191,255)
         return c.r < 0.1f && c.g > 0.2f && c.b > 0.5f;
+    }
+    private TextureRegion getRegion(Texture sheet, int col, int row) {
+        int size = 32;
+        TextureRegion region = new TextureRegion(sheet, col * size, row * size, size, size);
+        region.flip(false, true);
+        return region;
     }
 }

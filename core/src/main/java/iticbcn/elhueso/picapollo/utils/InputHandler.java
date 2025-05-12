@@ -1,5 +1,6 @@
 package iticbcn.elhueso.picapollo.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.math.Plane;
@@ -41,10 +42,13 @@ public class InputHandler implements InputProcessor {
         float w = stage.getViewport().getScreenWidth();
         if (screenX < w * 0.33f) {
             player.moveLeft();
-        } else if (screenX > w * 0.66f) {
+            System.out.println("left invocat");
+        } else if (screenX > w * 0.33f && screenX < w * 0.67f) {
             player.moveRight();
+            System.out.println("right invocat");
         } else {
             player.jump();
+            System.out.println("JUMP invocat");
         }
         return true;
     }

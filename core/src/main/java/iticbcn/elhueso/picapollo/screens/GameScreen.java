@@ -104,43 +104,82 @@ public class GameScreen implements Screen {
         checkCollectables();
         checkGoal();
         stage.draw();
+
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        PPGRectangle pb = player.getBounds();
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(pb.x, pb.y, pb.width, pb.height);
+
+        shapeRenderer.setColor(Color.GREEN);
+        for (Platform plat : levelPlatforms) {
+            PPGRectangle b = plat.getBounds();
+            shapeRenderer.rect(b.x, b.y, b.width, b.height);
+        }
+
+        shapeRenderer.end();
     }
 
     public void checkPlatform(float delta) {
         if (player == null) return;
 
+        // 1) Guarda la Y anterior para comparar
+        float oldY = player.getY();
+
+        // 2) Aplica gravedad y mueve X
         player.applyGravity(delta);
         player.moveX(delta);
 
+        // 2a) Resolución de colisión horizontal
         for (Platform plat : levelPlatforms) {
             if (player.getBounds().overlaps(plat.getBounds())) {
-                if (player.getVelocity().x > 0) {
-                    player.setX(plat.getX() - player.getWidth());
-                } else if (player.getVelocity().x < 0) {
-                    player.setX(plat.getX() + plat.getWidth());
+                float platBottom = plat.getY();
+                float platTop    = platBottom + plat.getHeight();
+                boolean vertOverlap =
+                    player.getY() + player.getHeight() > platBottom &&
+                        player.getY()             < platTop;
+                if (vertOverlap) {
+                    if (player.getVelocity().x > 0) {
+                        player.setX(plat.getX() - player.getWidth());
+                    } else if (player.getVelocity().x < 0) {
+                        player.setX(plat.getX() + plat.getWidth());
+                    }
+                    player.stopX();
+                    player.getBounds().setPosition(player.getX(), player.getY());
                 }
-                player.stopX();
             }
         }
 
+        // 3) Mueve Y y comprueba aterrizajes/techo
         player.moveY(delta);
-
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
+            // aterrizaje usando tu isLandingOn corregido
             if (player.isLandingOn(plat)) {
                 player.landOn(plat);
                 landed = true;
                 break;
-            }else if (player.getBounds().overlaps(plat.getBounds())) {
-                player.setY(plat.getY() + plat.getHeight());
-                player.resetVertical();
-                landed = true;
+            }
+            // choque con techo (subiendo)
+            if (player.getBounds().overlaps(plat.getBounds())
+                && player.getVelocity().y > 0) {
+                player.setY(plat.getY() - player.getHeight());
+                player.getVelocity().y = 0;
+                player.getBounds().setPosition(player.getX(), player.getY());
                 break;
             }
         }
-        if (!landed) {
+
+        // 4) Si no aterrizamos, estamos en el aire
+        if (!landed && player.getVelocity().y != 0) {
             player.fallOffPlatform();
         }
+
+        Gdx.app.log("Player",
+            "checkPlatform: landed=" + landed +
+                "  onGround=" + player.getOnGround()
+        );
     }
 
     private void checkSpikes() {
@@ -306,7 +345,7 @@ public class GameScreen implements Screen {
 
         } else if (isGoal(c)) {
             goal = new Goal(AssetManager.goalTexture, rect);
-            //goal.setVisible(false);
+            goal.setVisible(false);
             stage.addActor(goal);
 
         } else if (isPlayerSpawn(c)) {

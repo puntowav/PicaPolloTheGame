@@ -233,13 +233,13 @@ public class GameScreen implements Screen {
                 // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
-                player.resetJumps(); // ← aquí recuperas el salto al golpear por debajo
+                player.resetJumps();
                 break;
             }
         }
 
         // 4) Si no aterrizamos, estamos en el aire
-        if (!landed && player.getVelocity().y != 0) {
+        if (!landed) {
             player.fallOffPlatform();
         }
 

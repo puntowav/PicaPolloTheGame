@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.QuadTreeFloat;
 import java.util.List;
 import java.util.Random;
 
+import iticbcn.elhueso.picapollo.helpers.AssetManager;
 import iticbcn.elhueso.picapollo.screens.GameScreen;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
 
@@ -61,6 +62,8 @@ public class Player extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+        double prov = Math.random();
+        if(prov <= 0.33) AssetManager.fartSound.play();
         bounds.setPosition(getX(), getY());
     }
 

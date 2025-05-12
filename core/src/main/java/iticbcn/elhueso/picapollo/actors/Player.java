@@ -78,8 +78,6 @@ public class Player extends Actor {
         bounds.setPosition(getX(), getY());
     }
 
-    public void moveLeft(){ velocity.x = -SPEED; }
-    public void moveRight(){ velocity.x = SPEED; }
     public void moveLeft(){
         velocity.x = -SPEED;
         setScaleX(-1f);

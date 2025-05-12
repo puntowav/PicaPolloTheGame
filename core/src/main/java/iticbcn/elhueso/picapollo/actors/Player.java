@@ -45,11 +45,16 @@ public class Player extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         float x = getX(), y = getY(), w = getWidth(), h = getHeight();
-
         batch.draw(
             texture,
-            x + w, y + h,
-            -w, -h
+            x, y,
+            w / 2f, h / 2f,
+            w, h,
+            getScaleX(), 1f,
+            0,
+            0, 0,
+            texture.getWidth(), texture.getHeight(),
+            false, true
         );
     }
 
@@ -59,8 +64,14 @@ public class Player extends Actor {
         bounds.setPosition(getX(), getY());
     }
 
-    public void moveLeft(){velocity.x = -SPEED;}
-    public void moveRight(){velocity.x = SPEED;}
+    public void moveLeft(){
+        velocity.x = -SPEED;
+        setScaleX(-1f);
+    }
+    public void moveRight(){
+        velocity.x = SPEED;
+        setScaleX(1f);
+    }
     public void jump() {
         if (jumpsRemaining > 0) {
             Gdx.app.log("Player", "jump() invocado");

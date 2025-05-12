@@ -7,15 +7,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.InputMultiplexer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import iticbcn.elhueso.picapollo.actors.Collectable;
@@ -105,33 +102,33 @@ public class GameScreen implements Screen {
         checkGoal();
         stage.draw();
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-        PPGRectangle pb = player.getBounds();
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(pb.x, pb.y, pb.width, pb.height);
-
-        shapeRenderer.setColor(Color.GREEN);
-        for (Platform plat : levelPlatforms) {
-            PPGRectangle b = plat.getBounds();
-            shapeRenderer.rect(b.x, b.y, b.width, b.height);
-        }
-
-        shapeRenderer.end();
+//        shapeRenderer.setProjectionMatrix(camera.combined);
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//
+//        PPGRectangle pb = player.getBounds();
+//        shapeRenderer.setColor(Color.RED);
+//        shapeRenderer.rect(pb.x, pb.y, pb.width, pb.height);
+//
+//        shapeRenderer.setColor(Color.GREEN);
+//        for (Platform plat : levelPlatforms) {
+//            PPGRectangle b = plat.getBounds();
+//            shapeRenderer.rect(b.x, b.y, b.width, b.height);
+//        }
+//
+//        shapeRenderer.end();
     }
 
     public void checkPlatform(float delta) {
         if (player == null) return;
 
-        // 1) Guarda la Y anterior para comparar
+        // Guarda la Y anterior per comparar
         float oldY = player.getY();
 
-        // 2) Aplica gravedad y mueve X
+        // Aplica gravetat i mou X
         player.applyGravity(delta);
         player.moveX(delta);
 
-        // 2a) Resolución de colisión horizontal
+        // Resolució de colisió horizontal
         for (Platform plat : levelPlatforms) {
             if (player.getBounds().overlaps(plat.getBounds())) {
                 float platBottom = plat.getY();
@@ -146,7 +143,6 @@ public class GameScreen implements Screen {
                         player.setX(plat.getX() + plat.getWidth());
                     }
                     player.stopX();
-                    player.getBounds().setPosition(player.getX(), player.getY());
                 }
             }
         }
@@ -155,7 +151,7 @@ public class GameScreen implements Screen {
         player.moveY(delta);
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
-            // aterrizaje usando tu isLandingOn corregido
+            // aterrizaje usando isLandingOn
             if (player.isLandingOn(plat)) {
                 player.landOn(plat);
                 landed = true;
@@ -169,7 +165,8 @@ public class GameScreen implements Screen {
                 // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
-                player.resetJumps(); // ← aquí recuperas el salto al golpear por debajo
+                player.resetJumps();
+                player.fallOffPlatform();
                 break;
             }
         }

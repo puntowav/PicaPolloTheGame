@@ -117,8 +117,8 @@ public class GameScreen implements Screen {
         float btnY = Settings.GAME_HEIGHT - btnSize - margin;
 
         leftBtn.setPosition(-10, btnY);
-        rightBtn.setPosition(200, btnY);
-        jumpBtn.setPosition(Settings.GAME_WIDTH - btnSize - 40, btnY);
+        rightBtn.setPosition(225, btnY);
+        jumpBtn.setPosition(Settings.GAME_WIDTH - btnSize - 0, btnY);
 
         leftBtn.getColor().a = 0.4f;
         rightBtn.getColor().a = 0.4f;

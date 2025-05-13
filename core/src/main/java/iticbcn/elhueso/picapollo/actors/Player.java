@@ -127,6 +127,7 @@ public class Player extends Actor {
         Gdx.app.log("Player", "fallOffPlatform()");
         currentPlatform = null;
         onGround = false;
+        texture = AssetManager.playerTexture;
     }
 
     public Platform getCurrentPlatform(){return currentPlatform;}

@@ -63,6 +63,7 @@ public class GameScreen implements Screen {
     private List<PPGRectangle> debugRectangles;
 
     public GameScreen(Game game, int levelNum) {
+        AssetManager.backgroundSong.play();
         this.game = game;
         this.levelNum = levelNum;
         shapeRenderer = new ShapeRenderer();
@@ -188,14 +189,11 @@ public class GameScreen implements Screen {
     public void checkPlatform(float delta) {
         if (player == null) return;
 
-        // 1) Guarda la Y anterior para comparar
         float oldY = player.getY();
 
-        // 2) Aplica gravedad y mueve X
         player.applyGravity(delta);
         player.moveX(delta);
 
-        // 2a) Resolución de colisión horizontal
         for (Platform plat : levelPlatforms) {
             if (player.getBounds().overlaps(plat.getBounds())) {
                 float platBottom = plat.getY();
@@ -215,22 +213,19 @@ public class GameScreen implements Screen {
             }
         }
 
-        // 3) Mueve Y y comprueba aterrizajes/techo
         player.moveY(delta);
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
-            // aterrizaje usando tu isLandingOn corregido
+            player.setTexture(AssetManager.playerHangTexture);
             if (player.isLandingOn(plat)) {
                 player.landOn(plat);
                 landed = true;
                 break;
             }
-            // choque con techo (subiendo)
+
             if (player.getBounds().overlaps(plat.getBounds())
                 && player.getVelocity().y > 0) {
-                // reposiciona justo debajo de la plataforma
                 player.setY(plat.getY() - player.getHeight());
-                // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
                 player.resetJumps();
@@ -238,7 +233,6 @@ public class GameScreen implements Screen {
             }
         }
 
-        // 4) Si no aterrizamos, estamos en el aire
         if (!landed) {
             player.fallOffPlatform();
         }
@@ -253,6 +247,7 @@ public class GameScreen implements Screen {
     private void checkSpikes() {
         for (SpikesPlatform spike : levelSpikes) {
             if (player.getBounds().overlaps(spike.getBounds())) {
+                player.setTexture(AssetManager.playerDeath);
                 onPlayerDeath();
                 return;
             }
@@ -264,6 +259,7 @@ public class GameScreen implements Screen {
         for(int i = 0; i < levelCollectables.size(); i++){
             Collectable coll = levelCollectables.get(i);
             if(player.getBounds().overlaps(coll.getBounds())){
+                AssetManager.grabCollectable.play();
                 coll.remove();
                 levelCollectables.remove(i);
             }
@@ -278,6 +274,7 @@ public class GameScreen implements Screen {
     public void checkGoal(){
         if (player == null) return;
         if(goal != null && goal.isVisible() && player.getBounds().overlaps(goal.getBounds())){
+            AssetManager.goalReached.play();
             game.setScreen(new EndScreen(game, true));
         }
     }

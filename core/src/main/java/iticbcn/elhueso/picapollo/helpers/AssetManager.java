@@ -13,7 +13,7 @@ public class AssetManager {
     public static Texture enemyTexture;
     public static Texture goalTexture;
     public static Texture collectableTexture;
-    public static Texture grass;
+    public static Texture grass, playerHangTexture, playerDeath;
     public static Music titleSong;
     public static Music backgroundSong;
     public static Sound fartSound;
@@ -22,6 +22,8 @@ public class AssetManager {
 
     public static void load() {
         playerTexture      = new Texture("player.png");
+        playerHangTexture      = new Texture("playerHang.png");
+        playerDeath      = new Texture("dead.png");
         platformTexture    = new Texture("levels/platform.png");
         spikeTexture       = new Texture("levels/spike.png");
         enemyTexture       = new Texture("levels/enemy.png");

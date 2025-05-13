@@ -91,6 +91,7 @@ public class TitleScreen implements Screen {
         batch.end();
 
         if(Gdx.input.justTouched()) {
+            AssetManager.titleSong.stop();
             game.setScreen(new GameScreen(game, 1));
         }
     }

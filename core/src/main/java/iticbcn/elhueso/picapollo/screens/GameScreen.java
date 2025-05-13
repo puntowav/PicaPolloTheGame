@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -116,8 +115,8 @@ public class GameScreen implements Screen {
         float btnY = Settings.GAME_HEIGHT - btnSize - margin;
 
         leftBtn.setPosition(-10, btnY);
-        rightBtn.setPosition(225, btnY);
-        jumpBtn.setPosition(Settings.GAME_WIDTH - btnSize - 0, btnY);
+        rightBtn.setPosition(200, btnY);
+        jumpBtn.setPosition(Settings.GAME_WIDTH - btnSize - 40, btnY);
 
         leftBtn.getColor().a = 0.4f;
         rightBtn.getColor().a = 0.4f;
@@ -231,13 +230,13 @@ public class GameScreen implements Screen {
                 // anula velocidad vertical
                 player.getVelocity().y = 0;
                 player.getBounds().setPosition(player.getX(), player.getY());
-                player.resetJumps();
+                player.resetJumps(); // ← aquí recuperas el salto al golpear por debajo
                 break;
             }
         }
 
         // 4) Si no aterrizamos, estamos en el aire
-        if (!landed) {
+        if (!landed && player.getVelocity().y != 0) {
             player.fallOffPlatform();
         }
 
@@ -422,32 +421,26 @@ public class GameScreen implements Screen {
 
     // Detectors de colors
     private boolean isPlatform(Color c) {
-        // marrón (139,69,19) → r≈0.55, g≈0.27, b≈0.07
         return c.r > 0.5f && c.g < 0.4f && c.b < 0.1f;
     }
 
     private boolean isSpike(Color c) {
-        // rojo puro
         return c.r > 0.9f && c.g < 0.1f && c.b < 0.1f;
     }
 
     private boolean isEnemy(Color c) {
-        // púrpura (128,0,128) → r>.5, b>.5, g≈0
         return c.r > 0.5f && c.b > 0.5f && c.g < 0.1f;
     }
 
     private boolean isCollectable(Color c) {
-        // amarillo puro
         return c.r > 0.9f && c.g > 0.9f && c.b < 0.1f;
     }
 
     private boolean isGoal(Color c) {
-        // verde puro
         return c.g > 0.9f && c.r < 0.1f && c.b < 0.1f;
     }
 
     private boolean isPlayerSpawn(Color c) {
-        // cian ~ (0,191,255)
         return c.r < 0.1f && c.g > 0.2f && c.b > 0.5f;
     }
     private TextureRegion getRegion(Texture sheet, int col, int row) {

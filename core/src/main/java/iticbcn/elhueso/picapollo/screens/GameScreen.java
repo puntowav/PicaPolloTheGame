@@ -170,20 +170,20 @@ public class GameScreen implements Screen {
         hudStage.act(delta);
         hudStage.draw();
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-        PPGRectangle pb = player.getBounds();
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(pb.x, pb.y, pb.width, pb.height);
-
-        shapeRenderer.setColor(Color.GREEN);
-        for (Platform plat : levelPlatforms) {
-            PPGRectangle b = plat.getBounds();
-            shapeRenderer.rect(b.x, b.y, b.width, b.height);
-        }
-
-        shapeRenderer.end();
+//        shapeRenderer.setProjectionMatrix(camera.combined);
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//
+//        PPGRectangle pb = player.getBounds();
+//        shapeRenderer.setColor(Color.RED);
+//        shapeRenderer.rect(pb.x, pb.y, pb.width, pb.height);
+//
+//        shapeRenderer.setColor(Color.GREEN);
+//        for (Platform plat : levelPlatforms) {
+//            PPGRectangle b = plat.getBounds();
+//            shapeRenderer.rect(b.x, b.y, b.width, b.height);
+//        }
+//
+//        shapeRenderer.end();
     }
 
     public void checkPlatform(float delta) {
@@ -421,32 +421,26 @@ public class GameScreen implements Screen {
 
     // Detectors de colors
     private boolean isPlatform(Color c) {
-        // marrón (139,69,19) → r≈0.55, g≈0.27, b≈0.07
         return c.r > 0.5f && c.g < 0.4f && c.b < 0.1f;
     }
 
     private boolean isSpike(Color c) {
-        // rojo puro
         return c.r > 0.9f && c.g < 0.1f && c.b < 0.1f;
     }
 
     private boolean isEnemy(Color c) {
-        // púrpura (128,0,128) → r>.5, b>.5, g≈0
         return c.r > 0.5f && c.b > 0.5f && c.g < 0.1f;
     }
 
     private boolean isCollectable(Color c) {
-        // amarillo puro
         return c.r > 0.9f && c.g > 0.9f && c.b < 0.1f;
     }
 
     private boolean isGoal(Color c) {
-        // verde puro
         return c.g > 0.9f && c.r < 0.1f && c.b < 0.1f;
     }
 
     private boolean isPlayerSpawn(Color c) {
-        // cian ~ (0,191,255)
         return c.r < 0.1f && c.g > 0.2f && c.b > 0.5f;
     }
     private TextureRegion getRegion(Texture sheet, int col, int row) {

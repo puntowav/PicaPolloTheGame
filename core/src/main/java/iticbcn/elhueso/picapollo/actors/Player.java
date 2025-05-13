@@ -1,7 +1,6 @@
 package iticbcn.elhueso.picapollo.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,7 +16,6 @@ import iticbcn.elhueso.picapollo.screens.GameScreen;
 import iticbcn.elhueso.picapollo.utils.PPGRectangle;
 
 public class Player extends Actor {
-
 
     private static final Logger log = new Logger("Player", Logger.INFO);
 
@@ -41,6 +39,28 @@ public class Player extends Actor {
         this.texture = texture;
         this.bounds = rect;
         setBounds(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+    }
+
+    public Platform getCurrentPlatform(){return currentPlatform;}
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+
+    public Boolean getOnGround(){ return onGround; }
+
+    public void setOnGround(Boolean onGround){this.onGround = onGround;}
+
+    public PPGRectangle getBounds() {
+        return bounds;
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
     }
 
     @Override
@@ -94,10 +114,8 @@ public class Player extends Actor {
         float platformTop = r.y + r.height;
         float playerBottom = p.y;
 
-        // Aterriza solo si se mueve hacia abajo
         boolean isFalling = velocity.y <= 0;
 
-        // Está justo encima de la plataforma
         boolean closeVert = playerBottom >= platformTop - TOLERANCE &&
             playerBottom <= platformTop + TOLERANCE;
 
@@ -120,7 +138,7 @@ public class Player extends Actor {
         velocity.y = 0;
         onGround = true;
         currentPlatform = plat;
-        resetJumps();  // ↖ aquí recuperamos el salto al aterrizar
+        resetJumps();
     }
 
     public void fallOffPlatform() {
@@ -128,28 +146,6 @@ public class Player extends Actor {
         currentPlatform = null;
         onGround = false;
         texture = AssetManager.playerTexture;
-    }
-
-    public Platform getCurrentPlatform(){return currentPlatform;}
-
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public Boolean getOnGround(){return onGround;}
-
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }
-
-    public void setOnGround(Boolean onGround){this.onGround = onGround;}
-
-    public PPGRectangle getBounds() {
-        return bounds;
-    }
-
-    public Vector2 getVelocity() {
-        return velocity;
     }
 
     public void applyGravity(float delta) {

@@ -80,7 +80,7 @@ public class GameScreen implements Screen {
         levelCollectables = new ArrayList<>();
 
         // Obrim el mapa del nivell com a un  Bitmap
-        layout = new Pixmap(Gdx.files.internal("levels/trial_level_" + levelNum + "_layout.png"));
+        layout = new Pixmap(Gdx.files.internal("levels/level_" + levelNum + ".png"));
         List<PPGRectangle> blocs = detectBlocksByColor(layout);
 
         for (PPGRectangle rect : blocs) {

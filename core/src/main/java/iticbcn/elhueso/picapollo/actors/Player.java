@@ -63,7 +63,7 @@ public class Player extends Actor {
     public void act(float delta) {
         super.act(delta);
         double prov = Math.random();
-        if(prov <= 0.33) AssetManager.fartSound.play();
+        if(prov <= 0.003) AssetManager.fartSound.play();
         bounds.setPosition(getX(), getY());
     }
 

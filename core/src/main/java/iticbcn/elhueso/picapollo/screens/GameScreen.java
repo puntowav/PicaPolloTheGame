@@ -292,7 +292,7 @@ public class GameScreen implements Screen {
 
     public void onPlayerDeath(){
         game.setScreen(new EndScreen(game,false));
-        dispose();
+        AssetManager.backgroundSong.stop();
     }
 
     @Override

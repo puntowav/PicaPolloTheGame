@@ -88,8 +88,8 @@ public class EndScreen implements Screen {
     }
 
     public void goToTitleScreen(){
-        game.setScreen(new TitleScreen(game));
-        dispose();
+        AssetManager.backgroundSong.stop();
+        game.setScreen(new GameScreen(game,1));
     }
 
     @Override
@@ -157,9 +157,6 @@ public class EndScreen implements Screen {
         stage.dispose();
         if(buttonSheet!=null) buttonSheet.dispose();
         if (backgroundLose != null) backgroundLose.dispose();
-        if (AssetManager.youDied != null) AssetManager.youDied.dispose();
-        if (AssetManager.boing != null) AssetManager.boing.dispose();
-        if (AssetManager.yeahh != null) AssetManager.yeahh.dispose();
     }
     private TextureRegion getRegion(Texture sheet, int col, int row) {
         int size = 32;

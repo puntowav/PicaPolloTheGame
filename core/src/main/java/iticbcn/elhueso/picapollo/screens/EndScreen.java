@@ -33,12 +33,10 @@ public class EndScreen implements Screen {
     private float spinnerAngle = 0f;
     private Texture buttonSheet;
     private Image retryBtn;
-    private boolean playerDead = false;
 
-    private Texture background;
+    private Texture backgroundLose;
 
-
-
+    private Texture backgroundWin;
 
 
     public EndScreen(Game game, Boolean isWin){
@@ -48,18 +46,19 @@ public class EndScreen implements Screen {
 
     @Override
     public void show() {
-        AssetManager.youDied.play();
-        background = new Texture(Gdx.files.internal("endScreen.png"));
+        backgroundLose = new Texture(Gdx.files.internal("endScreenLose.png"));
+        backgroundWin = new Texture(Gdx.files.internal("endScreenWin.png"));
         stage = new Stage();
         batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("fonts/pixel_emulator.fnt"));
         font.getData().setScale(4f);
 
         if(isWin){
+            AssetManager.yeahh.play();
             message = "WIN";
-            bgColor = Color.BLUE;
-            fontColor = Color.WHITE;
+            fontColor = new Color(1f, 0.9f, 0.1f, 1f);
         }else{
+            AssetManager.youDied.play();
             message = "DEAD";
             fontColor = new Color(0.8f, 0.05f, 0.05f, 1f);
             buttonSheet = new Texture(Gdx.files.internal("buttons.png"));
@@ -101,7 +100,7 @@ public class EndScreen implements Screen {
         float width  = Gdx.graphics.getWidth();
         float height = Gdx.graphics.getHeight();
 
-        batch.draw(background, 0, 0, width, height);
+        batch.draw(isWin ? backgroundWin : backgroundLose, 0, 0, width, height);
 
         GlyphLayout layout = new GlyphLayout();
         layout.setText(font, message);
@@ -116,11 +115,13 @@ public class EndScreen implements Screen {
         float x = (width  - textWidth) / 2f;
         float y = (height + textHeight) / 2f;
 
-        font.setColor(0f, 0f, 0f, alpha);
+        Color shadowColor = isWin ? new Color(0.6f, 0.5f, 0f, alpha) : new Color(0f, 0f, 0f, alpha);
+        font.setColor(shadowColor);
         font.draw(batch, message, x + 2, y - 2);
 
-        font.setColor(0.8f, 0.05f, 0.05f, alpha);
+        font.setColor(fontColor.r, fontColor.g, fontColor.b, alpha);
         font.draw(batch, message, x, y);
+
 
         font.setColor(fontColor.r, fontColor.g, fontColor.b, 1f);
 
@@ -155,9 +156,10 @@ public class EndScreen implements Screen {
         font.dispose();
         stage.dispose();
         if(buttonSheet!=null) buttonSheet.dispose();
-        if (background != null) background.dispose();
-        AssetManager.youDied.dispose();
-        AssetManager.boing.dispose();
+        if (backgroundLose != null) backgroundLose.dispose();
+        if (AssetManager.youDied != null) AssetManager.youDied.dispose();
+        if (AssetManager.boing != null) AssetManager.boing.dispose();
+        if (AssetManager.yeahh != null) AssetManager.yeahh.dispose();
     }
     private TextureRegion getRegion(Texture sheet, int col, int row) {
         int size = 32;

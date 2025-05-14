@@ -26,9 +26,9 @@ public class Player extends Actor {
     private int jumpsRemaining = 1;
 
     private final float SPEED = 200f;
-    private final float JUMP_VELOCITY = -500f;
-    private final float GRAVITY = 1000f;
-    private static final float MAX_FALL_SPEED = 800f;
+    private final float JUMP_VELOCITY = -600f;
+    private final float GRAVITY = 750f;
+    private static final float MAX_FALL_SPEED = 500f;
 
     private static final float TOLERANCE = 5f;
 

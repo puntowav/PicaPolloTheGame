@@ -24,6 +24,8 @@ public class AssetManager {
 
     public static Sound boing;
 
+    public static Sound yeahh;
+
     public static void load() {
         playerTexture      = new Texture("player.png");
         playerHangTexture      = new Texture("playerHang.png");
@@ -43,6 +45,7 @@ public class AssetManager {
         grabCollectable = Gdx.audio.newSound(Gdx.files.internal("sounds/grab_collectable.mp3"));
         youDied = Gdx.audio.newSound(Gdx.files.internal("sounds/you-died.mp3"));
         boing = Gdx.audio.newSound(Gdx.files.internal("sounds/boing.mp3"));
+        yeahh = Gdx.audio.newSound(Gdx.files.internal("sounds/yeaaaah.mp3"));
 
     }
 
@@ -61,5 +64,6 @@ public class AssetManager {
         grabCollectable.dispose();
         youDied.dispose();
         boing.dispose();
+        yeahh.dispose();
     }
 }

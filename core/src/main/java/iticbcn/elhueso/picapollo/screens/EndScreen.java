@@ -10,12 +10,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+import iticbcn.elhueso.picapollo.helpers.AssetManager;
 
 public class EndScreen implements Screen {
     Game game;
@@ -32,6 +35,11 @@ public class EndScreen implements Screen {
     private Image retryBtn;
     private boolean playerDead = false;
 
+    private Texture background;
+
+
+
+
 
     public EndScreen(Game game, Boolean isWin){
         this.game = game;
@@ -40,9 +48,12 @@ public class EndScreen implements Screen {
 
     @Override
     public void show() {
+        AssetManager.youDied.play();
+        background = new Texture(Gdx.files.internal("endScreen.png"));
+        stage = new Stage();
         batch = new SpriteBatch();
-        font = new BitmapFont();
-        font.getData().setScale(2f);
+        font = new BitmapFont(Gdx.files.internal("fonts/pixel_emulator.fnt"));
+        font.getData().setScale(4f);
 
         if(isWin){
             message = "WIN";
@@ -50,37 +61,31 @@ public class EndScreen implements Screen {
             fontColor = Color.WHITE;
         }else{
             message = "DEAD";
-            bgColor = Color.RED;
-            fontColor = Color.BLACK;
+            fontColor = new Color(0.8f, 0.05f, 0.05f, 1f);
             buttonSheet = new Texture(Gdx.files.internal("buttons.png"));
-            TextureRegion retryRegion = getRegion(buttonSheet, 1, 3);
+            TextureRegion retryRegion = getRegion(buttonSheet, 3, 1);
 
             retryBtn = new Image(retryRegion);
-            retryBtn.setSize(128, 128);
-            retryBtn.setPosition(Gdx.graphics.getWidth() / 2f - 64, Gdx.graphics.getHeight() / 2f - 64);
+            retryBtn.setSize(200, 200);
+            retryBtn.setPosition(
+                Gdx.graphics.getWidth() / 2f - retryBtn.getWidth() / 2f,
+                Gdx.graphics.getHeight() / 2f - retryBtn.getHeight() / 2f - 250f
+            );
+
+            retryBtn.getColor().a = 0.4f;
 
             retryBtn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    AssetManager.boing.play();
                     goToTitleScreen();
                 }
             });
 
-            stage = new Stage();
             stage.addActor(retryBtn);
             Gdx.input.setInputProcessor(stage);
         }
-
         font.setColor(fontColor);
-
-        InputAdapter fallbackClick = new InputAdapter() {
-            @Override
-            public boolean touchDown(int x, int y, int pointer, int button) {
-                goToTitleScreen();
-                return true;
-            }
-        };
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage, fallbackClick));
     }
 
     public void goToTitleScreen(){
@@ -90,21 +95,38 @@ public class EndScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
         float width  = Gdx.graphics.getWidth();
         float height = Gdx.graphics.getHeight();
 
-        float textWidth  = font.getRegion().getRegionWidth() * font.getScaleX() * message.length() * 0.5f;
-        float textHeight = font.getCapHeight() * font.getScaleY();
+        batch.draw(background, 0, 0, width, height);
 
-        font.draw(batch,
-            message,
-            (width  - textWidth)  / 2f,
-            (height + textHeight) / 2f);
+        GlyphLayout layout = new GlyphLayout();
+        layout.setText(font, message);
+        float textWidth = layout.width;
+        float textHeight = layout.height;
+
+        float time = (float) Math.sin(System.currentTimeMillis() / 300.0);
+        float alpha = 0.75f + 0.25f * time;
+
+        font.setColor(fontColor.r, fontColor.g, fontColor.b, alpha);
+
+        float x = (width  - textWidth) / 2f;
+        float y = (height + textHeight) / 2f;
+
+        font.setColor(0f, 0f, 0f, alpha);
+        font.draw(batch, message, x + 2, y - 2);
+
+        font.setColor(0.8f, 0.05f, 0.05f, alpha);
+        font.draw(batch, message, x, y);
+
+        font.setColor(fontColor.r, fontColor.g, fontColor.b, 1f);
+
         batch.end();
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
@@ -131,6 +153,11 @@ public class EndScreen implements Screen {
     public void dispose() {
         batch.dispose();
         font.dispose();
+        stage.dispose();
+        if(buttonSheet!=null) buttonSheet.dispose();
+        if (background != null) background.dispose();
+        AssetManager.youDied.dispose();
+        AssetManager.boing.dispose();
     }
     private TextureRegion getRegion(Texture sheet, int col, int row) {
         int size = 32;

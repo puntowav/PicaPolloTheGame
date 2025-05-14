@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
@@ -20,9 +21,6 @@ import iticbcn.elhueso.picapollo.utils.Settings;
 
 public class TitleScreen implements Screen {
 
-    private OrthographicCamera camera;
-    private FitViewport viewport;
-    private Stage stage;
     private Batch batch;
     private Game game;
     private BitmapFont font;
@@ -34,13 +32,7 @@ public class TitleScreen implements Screen {
     public TitleScreen(Game game) {
         this.game = game;
         AssetManager.titleSong.play();
-        camera = new OrthographicCamera();
-        camera.setToOrtho(true, Settings.GAME_WIDTH, Settings.GAME_HEIGHT);
-        camera.position.set(Settings.GAME_WIDTH / 2f, Settings.GAME_HEIGHT / 2f, 0);
-        camera.update();
-        viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
-        stage = new Stage(viewport);
-        batch = stage.getBatch();
+        batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("fonts/pixel_emulator.fnt"));
         layout = new GlyphLayout(font, "El huesaso loco");
 
@@ -54,14 +46,11 @@ public class TitleScreen implements Screen {
         flagAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
         stateTime = 0f;
     }
-    @Override public void resize(int width, int height) {
-        viewport.update(width, height, true);
-    }
+    @Override public void resize(int width, int height) {}
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
     @Override public void dispose() {
-        stage.dispose();
         font.dispose();
         for (TextureRegion region : flagAnimation.getKeyFrames()) {
             region.getTexture().dispose();
@@ -74,19 +63,18 @@ public class TitleScreen implements Screen {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        font.getData().setScale(1f, -1f);
-
-        viewport.apply();
-
         stateTime += delta;
         TextureRegion currentFrame = flagAnimation.getKeyFrame(stateTime, true);
 
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        batch.draw(currentFrame, 0, 0, Settings.GAME_WIDTH, Settings.GAME_HEIGHT);
+        font.getData().setScale(Gdx.graphics.getWidth() / 480f);
+        layout.setText(font, "El huesaso loco");
 
-        float x = (Settings.GAME_WIDTH - layout.width) / 2;
-        float y = (Settings.GAME_HEIGHT + layout.height) / 2 + 100;
+        float x = (Gdx.graphics.getWidth() - layout.width) / 2f;
+        float y = (Gdx.graphics.getHeight() + layout.height) / 2f;
+
+        batch.begin();
+        batch.draw(currentFrame, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        font.setColor(1f, 1f, 1f, 1f);
         font.draw(batch, layout, x,y);
         batch.end();
 

@@ -180,6 +180,12 @@ public class GameScreen implements Screen {
         stage.draw();
         hudStage.act(delta);
         hudStage.draw();
+        if (player.thumbsUpTime > 0f) {
+            player.thumbsUpTime -= delta;
+            if (player.thumbsUpTime <= 0f) {
+                player.setTexture(AssetManager.playerTexture);
+            }
+        }
 
 //        shapeRenderer.setProjectionMatrix(camera.combined);
 //        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -227,7 +233,9 @@ public class GameScreen implements Screen {
         player.moveY(delta);
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
-            player.setTexture(AssetManager.playerHangTexture);
+            if (!player.isDoingThumbsUp()) {
+                player.setTexture(AssetManager.playerHangTexture);
+            }
             if (player.isLandingOn(plat)) {
                 player.landOn(plat);
                 landed = true;
@@ -270,6 +278,8 @@ public class GameScreen implements Screen {
         for(int i = 0; i < levelCollectables.size(); i++){
             Collectable coll = levelCollectables.get(i);
             if(player.getBounds().overlaps(coll.getBounds())){
+                player.setTexture(AssetManager.playerThumbsUp);
+                player.thumbsUpTime = 1f;
                 AssetManager.grabCollectable.play();
                 coll.remove();
                 levelCollectables.remove(i);

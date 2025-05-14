@@ -13,23 +13,21 @@ public class AssetManager {
     public static Texture enemyTexture;
     public static Texture goalTexture;
     public static Texture collectableTexture;
-    public static Texture grass, playerHangTexture, playerDeath;
+    public static Texture grass, playerHangTexture, playerDeath, playerThumbsUp;
     public static Texture bg;
     public static Music titleSong;
     public static Music backgroundSong;
     public static Sound fartSound;
     public static Sound goalReached;
     public static Sound grabCollectable;
-
     public static Sound youDied;
-
     public static Sound boing;
-
     public static Sound yeahh;
 
     public static void load() {
         playerTexture = new Texture("player.png");
         playerHangTexture = new Texture("playerHang.png");
+        playerThumbsUp = new Texture("thumbsUp.png");
         playerDeath = new Texture("dead.png");
         platformTexture = new Texture("levels/platform.png");
         spikeTexture = new Texture("levels/spike.png");
@@ -54,6 +52,8 @@ public class AssetManager {
 
     public static void dispose() {
         playerTexture.dispose();
+        playerThumbsUp.dispose();
+        playerHangTexture.dispose();
         platformTexture.dispose();
         spikeTexture.dispose();
         enemyTexture.dispose();

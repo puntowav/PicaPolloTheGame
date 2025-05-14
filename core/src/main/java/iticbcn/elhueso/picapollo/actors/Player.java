@@ -22,6 +22,7 @@ public class Player extends Actor {
     private Vector2 velocity = new Vector2(0, 0);
     private boolean onGround = true;
     private Platform currentPlatform = null;
+    public float thumbsUpTime = 0f;
 
     private int jumpsRemaining = 1;
 
@@ -79,12 +80,17 @@ public class Player extends Actor {
         );
     }
 
+    public boolean isDoingThumbsUp() {
+        return thumbsUpTime > 0f;
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
         double prov = Math.random();
         if(prov <= 0.003) AssetManager.fartSound.play();
         bounds.setPosition(getX(), getY());
+
     }
 
     public void moveLeft(){
@@ -145,7 +151,9 @@ public class Player extends Actor {
         Gdx.app.log("Player", "fallOffPlatform()");
         currentPlatform = null;
         onGround = false;
-        texture = AssetManager.playerTexture;
+        if (!isDoingThumbsUp()) {
+            texture = AssetManager.playerTexture;
+        }
     }
 
     public void applyGravity(float delta) {

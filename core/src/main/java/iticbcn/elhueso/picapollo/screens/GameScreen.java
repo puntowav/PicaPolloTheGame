@@ -25,6 +25,7 @@ import java.util.List;
 import iticbcn.elhueso.picapollo.actors.Collectable;
 import iticbcn.elhueso.picapollo.actors.Enemy;
 import iticbcn.elhueso.picapollo.actors.Goal;
+import iticbcn.elhueso.picapollo.actors.Grass;
 import iticbcn.elhueso.picapollo.actors.Platform;
 import iticbcn.elhueso.picapollo.actors.Player;
 import iticbcn.elhueso.picapollo.actors.SpikesPlatform;
@@ -416,33 +417,44 @@ public class GameScreen implements Screen {
         } else if (isPlayerSpawn(c)) {
             player = new Player(AssetManager.playerTexture, rect);
             stage.addActor(player);
+        } else if (isGrass(c)) {
+            Grass grass = new Grass(AssetManager.grass, rect);
+            levelPlatforms.add(grass);
+            stage.addActor(grass);
         }
     }
 
     // Detectors de colors
     private boolean isPlatform(Color c) {
-        return c.r > 0.5f && c.g < 0.4f && c.b < 0.1f;
+        // Rosa: (255, 0, 223) → #FF00DF
+        return c.r > 0.9f && c.g < 0.1f && c.b > 0.8f;
     }
 
     private boolean isSpike(Color c) {
+        // Vermell: (255, 0, 0)
         return c.r > 0.9f && c.g < 0.1f && c.b < 0.1f;
     }
-
     private boolean isEnemy(Color c) {
-        return c.r > 0.5f && c.b > 0.5f && c.g < 0.1f;
+        // Lila: (128, 0, 128)
+        return c.r > 0.4f && c.r < 0.6f && c.g < 0.2f && c.b > 0.4f && c.b < 0.6f;
     }
-
     private boolean isCollectable(Color c) {
+        // Grog: (255, 255, 0)
         return c.r > 0.9f && c.g > 0.9f && c.b < 0.1f;
     }
-
     private boolean isGoal(Color c) {
-        return c.g > 0.9f && c.r < 0.1f && c.b < 0.1f;
+        // Verd: (0, 255, 0)
+        return c.r < 0.1f && c.g > 0.9f && c.b < 0.1f;
+    }
+    private boolean isPlayerSpawn(Color c) {
+        // Azul celeste: (0, 191, 255)
+        return c.r < 0.1f && c.g > 0.6f && c.b > 0.9f;
+    }
+    private boolean isGrass(Color c) {
+        // Blanco: (255, 255, 255)
+        return c.r > 0.95f && c.g > 0.95f && c.b > 0.95f;
     }
 
-    private boolean isPlayerSpawn(Color c) {
-        return c.r < 0.1f && c.g > 0.2f && c.b > 0.5f;
-    }
     private TextureRegion getRegion(Texture sheet, int col, int row) {
         int size = 32;
         TextureRegion region = new TextureRegion(sheet, col * size, row * size, size, size);

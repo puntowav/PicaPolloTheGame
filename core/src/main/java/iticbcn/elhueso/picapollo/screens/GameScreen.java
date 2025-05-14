@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -43,6 +44,7 @@ public class GameScreen implements Screen {
 
     private int levelNum;
     private Pixmap layout;
+    private Texture background;
 
     private OrthographicCamera camera;
     private FitViewport viewport;
@@ -50,6 +52,7 @@ public class GameScreen implements Screen {
     private Stage hudStage;
 
     private Game game;
+    private SpriteBatch batch;
 
     // Actors
     private List<PPGRectangle> allLevelActors;
@@ -72,8 +75,10 @@ public class GameScreen implements Screen {
         camera.setToOrtho(true, Settings.GAME_WIDTH, Settings.GAME_HEIGHT);
         camera.position.set(Settings.GAME_WIDTH / 2f, Settings.GAME_HEIGHT / 2f, 0);
         camera.update();
+        background = AssetManager.bg;
         viewport = new FitViewport(Settings.GAME_WIDTH, Settings.GAME_HEIGHT, camera);
         stage = new Stage(viewport);
+        batch = new SpriteBatch();
 
         // Llistes d'actors
         levelPlatforms = new ArrayList<>();
@@ -162,6 +167,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         viewport.apply();
+
+        batch.begin();
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
+
         stage.act(delta);
         checkPlatform(delta);
         checkSpikes();

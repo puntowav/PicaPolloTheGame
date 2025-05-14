@@ -20,6 +20,12 @@ public class SpikesPlatform extends Platform {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(this.getTexture(), getX(), getY(), getWidth(), getHeight());
+        batch.draw(
+            this.getTexture(),
+            getX(),
+            getY() + getHeight(),
+            getWidth(),
+            -getHeight()
+        );
     }
 }

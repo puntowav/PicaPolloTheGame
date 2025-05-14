@@ -14,6 +14,7 @@ public class AssetManager {
     public static Texture goalTexture;
     public static Texture collectableTexture;
     public static Texture grass, playerHangTexture, playerDeath;
+    public static Texture bg;
     public static Music titleSong;
     public static Music backgroundSong;
     public static Sound fartSound;
@@ -27,15 +28,17 @@ public class AssetManager {
     public static Sound yeahh;
 
     public static void load() {
-        playerTexture      = new Texture("player.png");
-        playerHangTexture      = new Texture("playerHang.png");
-        playerDeath      = new Texture("dead.png");
-        platformTexture    = new Texture("levels/platform.png");
-        spikeTexture       = new Texture("levels/spike.png");
-        enemyTexture       = new Texture("levels/enemy.png");
-        goalTexture        = new Texture("levels/goal.png");
+        playerTexture = new Texture("player.png");
+        playerHangTexture = new Texture("playerHang.png");
+        playerDeath = new Texture("dead.png");
+        platformTexture = new Texture("levels/platform.png");
+        spikeTexture = new Texture("levels/spike.png");
+        enemyTexture = new Texture("levels/enemy.png");
+        goalTexture = new Texture("levels/goal.png");
         collectableTexture = new Texture("levels/collectible.png");
         grass = new Texture("levels/grass.png");
+        bg = new Texture("levels/bg.png");
+
 
         // music and sounds
         titleSong = Gdx.audio.newMusic(Gdx.files.internal("music/title_song.mp3"));

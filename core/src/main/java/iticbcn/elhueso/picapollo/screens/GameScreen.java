@@ -232,7 +232,7 @@ public class GameScreen implements Screen {
         player.moveY(delta);
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
-            if (!player.isDoingThumbsUp() && player.getVelocity().y < 0 && Math.abs(player.getVelocity().x) < 0.1f) {
+            if (!player.isDoingThumbsUp()) {
                 player.setTexture(AssetManager.playerHangTexture);
             }
             if (player.isLandingOn(plat)) {

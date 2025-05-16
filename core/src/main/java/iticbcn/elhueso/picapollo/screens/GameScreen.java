@@ -296,6 +296,7 @@ public class GameScreen implements Screen {
         if (player == null) return;
         if(goal != null && goal.isVisible() && player.getBounds().overlaps(goal.getBounds())){
             AssetManager.goalReached.play();
+            AssetManager.backgroundSong.stop();
             game.setScreen(new EndScreen(game, true));
         }
     }

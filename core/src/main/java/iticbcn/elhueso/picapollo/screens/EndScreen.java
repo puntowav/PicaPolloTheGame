@@ -2,13 +2,11 @@ package iticbcn.elhueso.picapollo.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -57,6 +55,12 @@ public class EndScreen implements Screen {
             AssetManager.yeahh.play();
             message = "WIN";
             fontColor = new Color(1f, 0.9f, 0.1f, 1f);
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    goToTitleScreen();
+                }
+            }, 5f);
         }else{
             AssetManager.youDied.play();
             message = "DEAD";

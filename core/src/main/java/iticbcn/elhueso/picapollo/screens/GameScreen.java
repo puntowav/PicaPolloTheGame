@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
 
     // Constants
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
-    private static final int LAST_LEVEL_NUM = 2;
+    private static final int LAST_LEVEL_NUM = 3;
     private static final float TILE_SIZE = 1f;
 
     private int levelNum;

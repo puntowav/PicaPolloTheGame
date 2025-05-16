@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
 
     // Constants
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 1); // Negre per al fons
-    private static final int LAST_LEVEL_NUM = 3;
+    private static final int LAST_LEVEL_NUM = 2;
     private static final float TILE_SIZE = 1f;
 
     private int levelNum;
@@ -55,7 +55,6 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
 
     // Actors
-    private List<PPGRectangle> allLevelActors;
     private List<Platform> levelPlatforms;
     private List<SpikesPlatform> levelSpikes;
     private List<Collectable> levelCollectables;
@@ -233,7 +232,7 @@ public class GameScreen implements Screen {
         player.moveY(delta);
         boolean landed = false;
         for (Platform plat : levelPlatforms) {
-            if (!player.isDoingThumbsUp()) {
+            if (!player.isDoingThumbsUp() && player.getVelocity().y < 0 && Math.abs(player.getVelocity().x) < 0.1f) {
                 player.setTexture(AssetManager.playerHangTexture);
             }
             if (player.isLandingOn(plat)) {
@@ -297,7 +296,13 @@ public class GameScreen implements Screen {
         if(goal != null && goal.isVisible() && player.getBounds().overlaps(goal.getBounds())){
             AssetManager.goalReached.play();
             AssetManager.backgroundSong.stop();
-            game.setScreen(new EndScreen(game, true));
+
+            if (levelNum < LAST_LEVEL_NUM) {
+                levelNum++;
+                game.setScreen(new GameScreen(game, levelNum));
+            } else {
+                game.setScreen(new EndScreen(game, true));
+            }
         }
     }
 
